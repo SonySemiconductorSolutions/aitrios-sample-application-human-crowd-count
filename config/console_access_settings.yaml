@@ -1,0 +1,5 @@
+console_access_settings:
+  console_endpoint: "__console_endpoint__"
+  portal_authorization_endpoint: "__portal_authorization_endpoint__"
+  client_secret: "__client_secret__"
+  client_id: "__client_id__"
