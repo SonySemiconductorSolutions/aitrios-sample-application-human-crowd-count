@@ -1,0 +1,22 @@
+data_source_settings:
+  mode: "local"     # "console" or "local"
+  console_data_settings:
+    setting_path: "./config/console_access_settings.yaml"
+    device_id: "__device_id__"
+    sub_directory_name: "__sub_directory_name__"
+    first_timestamp: "__last_timestamp__"
+    last_timestamp: "__last_timestamp__"
+    number_of_inference_results: 20
+    number_of_images: 20
+  local_data_settings:
+    video_file: "./input/sample.mp4"
+    meta_file: "./input/sample.csv"
+
+crowd_count_settings:
+  param_file: "./config/local_default_param.yaml"
+
+output_settings:
+  output_dir: "output/sample"
+  output_video_fps: 30
+  output_video_width: 1920
+  output_video_height: 1080
