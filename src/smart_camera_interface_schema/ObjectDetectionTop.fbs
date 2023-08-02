@@ -1,0 +1,28 @@
+namespace SmartCamera;
+
+table BoundingBox2d {
+  left:int;
+  top:int;
+  right:int;
+  bottom:int;
+}
+
+union BoundingBox {
+  BoundingBox2d,
+}
+
+table GeneralObject {
+  class_id: uint;
+  bounding_box:BoundingBox;
+  score:float;
+}
+
+table ObjectDetectionData {
+  object_detection_list:[GeneralObject];
+}
+
+table ObjectDetectionTop{
+  perception:ObjectDetectionData;
+}
+
+root_type ObjectDetectionTop;
