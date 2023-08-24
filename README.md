@@ -76,7 +76,7 @@ The Command Parameter file must be set appropriately. Here is an example of para
                 "PPLParameter": {
                     "header": {
                         "id": "00",
-                        "version": "01.00.00"
+                        "version": "01.01.00"
                     },
                     "dnn_output_detections" : 64,
                     "max_detections" : 5,
