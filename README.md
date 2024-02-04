@@ -247,7 +247,7 @@ console_access_settings:
   client_id: "__client_id__"
 ```
 
-See the [Portal user manual](https://developer.aitrios.sony-semicon.com/en/documents/portal-user-manual) for details.
+See the [Portal user manual](https://developer.aitrios.sony-semicon.com/en/edge-ai-sensing/documents/portal-user-manual/) for details.
 
 
 #### Step 2-2: Set application parameters
