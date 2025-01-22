@@ -14,25 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-import os
-import yaml
 import argparse
+import os
+
+import yaml
 from tqdm import tqdm
 
 import console_data_loader
-import local_data_loader
 import crowd_count
 import crowd_count_output
+import local_data_loader
 
 
 def main():
-    """main process
-
-    """
+    """main process"""
 
     # Get argument
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config_path', type=str, default='config/crowd_count_app.yaml')
+    parser.add_argument("--config_path",
+                        type=str,
+                        default="config/crowd_count_app.yaml")
     args = parser.parse_args()
 
     # Init
@@ -45,35 +46,35 @@ def main():
 
     # Load config from yaml file
     if os.path.exists(args.config_path):
-        with open(args.config_path, 'r', encoding='utf-8') as file:
+        with open(args.config_path, "r", encoding="utf-8") as file:
             config = yaml.safe_load(file)
     else:
-        raise ValueError(f'cannot open {args.config_path}')
+        raise ValueError(f"cannot open {args.config_path}")
 
     # Check config parameter
-    if not 'data_source_settings' in config:
-        raise ValueError('data source settings is not found')
-    if not 'crowd_count_settings' in config:
-        raise ValueError('crowd_count settings is not found')
-    if not 'output_settings' in config:
-        raise ValueError('output settings is not found')
+    if not "data_source_settings" in config:
+        raise ValueError("data source settings is not found")
+    if not "crowd_count_settings" in config:
+        raise ValueError("crowd_count settings is not found")
+    if not "output_settings" in config:
+        raise ValueError("output settings is not found")
 
     # Select load data method and create instance
-    if config['data_source_settings']['mode'] == 'console':
+    if config["data_source_settings"]["mode"] == "console":
         data_loader = console_data_loader.ConsoleDataLoader(
-            config['data_source_settings']['console_data_settings'])
-    elif config['data_source_settings']['mode'] == 'local':
+            config["data_source_settings"]["console_data_settings"])
+    elif config["data_source_settings"]["mode"] == "local":
         data_loader = local_data_loader.LocalDataLoader(
-            config['data_source_settings']['local_data_settings'])
+            config["data_source_settings"]["local_data_settings"])
     else:
         raise ValueError(
             f"{config['data_source_settings']['mode']} is not supported")
     image_info = data_loader.get_image_info()
 
     # Load detect config parameter from yaml
-    with open(
-            config['crowd_count_settings']['param_file'], 'r', encoding='utf-8'
-        ) as file:
+    with open(config["crowd_count_settings"]["param_file"],
+              "r",
+              encoding="utf-8") as file:
         crowd_count_params = yaml.safe_load(file)
 
     # Create instance of detect class
@@ -82,13 +83,13 @@ def main():
 
     # Instance creation of output class
     output_writer = crowd_count_output.CrowdCountOutput(
-        config['output_settings'], image_info, param_info)
+        config["output_settings"], image_info, param_info)
 
     # Load data
     image_list, meta_list, timestamp_list = data_loader()
 
     # Detect loop
-    for i, meta in enumerate(tqdm(meta_list, desc='processing')):
+    for i, meta in enumerate(tqdm(meta_list, desc="processing")):
 
         # check image data
         if len(image_list) > i:
@@ -109,5 +110,5 @@ def main():
         output_writer(detect, image, timestamp)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

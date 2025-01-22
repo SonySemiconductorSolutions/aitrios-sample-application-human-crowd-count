@@ -33,7 +33,7 @@ None
 1. Clone or fork this application in your GitHub environment.
 2. Click the `+` button to create a codespace on the GitHub environment. See [how to create a codespace](https://docs.github.com/en/codespaces/developing-in-codespaces/creating-a-codespace-for-a-repository).
 > **Note**
-> Please select a machine type with 16 cores and 32GB of RAM for smmoth operation of the application.
+> Please select a machine type with 16 cores and 32GB of RAM for smooth operation of the application.
 3. Run the demo application using the following command
     ```
     python src/crowd_count_app.py
@@ -116,22 +116,44 @@ The minimum required parameters are as follows.
 - `sub_directory_name`: The name of the subdirectory where the target images are stored
 - `number_of_images`: The maximum number of images to get
 
+The following parameters are optional, but highly recommended, especially if you have a large number of images stored on Console.
+- `first_timestamp`: The earliest timestamp of the target data in string format or `""`(empty string)
+- `last_timestamp`: The latest timestamp of the target data in string format or `""`(empty string)
+
+Either `first_timestamp` or `last_timestamp` must be set.
+Here are the setting values for `first_timestamp` and `last_timestamp`, and the corresponding behaviors.
+
+| `first_timestamp`     | `last_timestamp` | Behavior |
+|-----------------------| --- | --- |
+| `"yyyyMMddHHmmssfff"` |  `"yyyyMMddHHmmssfff"` | Get up to `number_of_inference_results` counted from the latest metadata from `first_timestamp` to `last_timestamp` |
+| `"yyyyMMddHHmmssfff"` | `""` | Get up to `number_of_inference_results` counted from the latest metadata from `first_timestamp` to 10 hours after `first_timestamp` |
+| `""`                  | `"yyyyMMddHHmmssfff"` | Get up to `number_of_inference_results` counted from the latest metadata before `last_timestamp` |
+| `""`                  | `""` | Raise Value Error |
+
 Here is an example.
 ```
 data_source_settings:
   mode: "console"
   console_data_settings:
-    setting_path: "./config/console_access_settings.yaml"
-    device_id: "__device_id__"
-    sub_directory_name: "__sub_directory_name__"
-    first_timestamp: "yyyyMMddHHmmssfff"                   # invalid
-    last_timestamp: "yyyyMMddHHmmssfff"                    # invalid
-    number_of_inference_results: 20                        # invalid
-    number_of_images: 20
+    setting_path: "./config/console_access_settings.yaml" # Required
+    device_id: "__device_id__"                            # Required
+    sub_directory_name: "__sub_directory_name__"          # Required
+    first_timestamp: "yyyyMMddHHmmssfff"                  # Can be invalid if last_timestamp is not empty
+    last_timestamp: "yyyyMMddHHmmssfff"                   # Can be invalid if first_timestamp is not empty
+    number_of_inference_results: 20                       # Not used
+    number_of_images: 20                                  # Required
   local_data_settings:
-    video_file: "__path_to_video_file__"                   # invalid
-    meta_file: "__path_to_csv_meta_file__"                 # invalid
+    video_file: "__path_to_video_file__"                  # Not used
+    meta_file: "__path_to_csv_meta_file__"                # Not used
 ```
+
+> **Note**
+> This application has a restriction that `number_of_images` must be less than or equal to 256.
+
+> **Note**
+> Images are loaded from **earliest**.
+> This application will retrieve up to `number_of_images` of the most earliest images within the time period between `first_timestamp` and `last_timestamp`.
+> This behavior can be controlled by the `order_by` parameter of `get_images` API, which is defaultly specified as `"ASC"` in this application.
 
 ##### Case 2: Use only metadata from Console
 
@@ -166,16 +188,16 @@ Here is an example.
 data_source_settings:
   mode: "console"
   console_data_settings:
-    setting_path: "./config/console_access_settings.yaml"
-    device_id: "__device_id__"
-    sub_directory_name: ""                                 # Do not specify an Image node
-    first_timestamp: "yyyyMMddHHmmssfff"
-    last_timestamp: "yyyyMMddHHmmssfff"
-    number_of_inference_results: 20
-    number_of_images: 20                                   # invalid
+    setting_path: "./config/console_access_settings.yaml" # Required
+    device_id: "__device_id__"                            # Required
+    sub_directory_name: ""  # Set to an empty string to skip loading images.
+    first_timestamp: "yyyyMMddHHmmssfff"                  # Can be invalid
+    last_timestamp: "yyyyMMddHHmmssfff"                   # Can be invalid
+    number_of_inference_results: 20                       # Required
+    number_of_images: 20                                  # Not used
   local_data_settings:
-    video_file: "__path_to_video_file__"                   # invalid
-    meta_file: "__path_to_csv_meta_file__"                 # invalid
+    video_file: "__path_to_video_file__"                  # Not used
+    meta_file: "__path_to_csv_meta_file__"                # Not used
 ```
 
 ##### Case 3: Use local video and metadata
@@ -196,16 +218,16 @@ Here is an example.
 data_source_settings:
   mode: "local"
   console_data_settings:
-    setting_path: "./config/console_access_settings.yaml"  # invalid
-    device_id: "__device_id__"                             # invalid
-    sub_directory_name: "__sub_directory_name__"           # invalid
-    first_timestamp: "yyyyMMddHHmmssfff"                   # invalid
-    last_timestamp: "yyyyMMddHHmmssfff"                    # invalid
-    number_of_inference_results: 20                        # invalid
-    number_of_images: 20                                   # invalid
+    setting_path: "./config/console_access_settings.yaml" # Not used
+    device_id: "__device_id__"                            # Not used
+    sub_directory_name: "__sub_directory_name__"          # Not used
+    first_timestamp: "yyyyMMddHHmmssfff"                  # Not used
+    last_timestamp: "yyyyMMddHHmmssfff"                   # Not used
+    number_of_inference_results: 20                       # Not used
+    number_of_images: 20                                  # Not used
   local_data_settings:
-    video_file: "./input/sample.mp4"
-    meta_file: "./input/sample.csv"
+    video_file: "./input/sample.mp4"                      # Required
+    meta_file: "./input/sample.csv"                       # Required
 ```
 
 ##### Case 4: Use only local metadata
@@ -223,16 +245,16 @@ Here is an example.
 data_source_settings:
   mode: "local"
   console_data_settings:
-    setting_path: "./config/console_access_settings.yaml"  # invalid
-    device_id: "__device_id__"                             # invalid
-    sub_directory_name: "__sub_directory_name__"           # invalid
-    first_timestamp: "yyyyMMddHHmmssfff"                   # invalid
-    last_timestamp: "yyyyMMddHHmmssfff"                    # invalid
-    number_of_inference_results: 20                        # invalid
-    number_of_images: 20                                   # invalid
+    setting_path: "./config/console_access_settings.yaml" # Not used
+    device_id: "__device_id__"                            # Not used
+    sub_directory_name: "__sub_directory_name__"          # Not used
+    first_timestamp: "yyyyMMddHHmmssfff"                  # Not used
+    last_timestamp: "yyyyMMddHHmmssfff"                   # Not used
+    number_of_inference_results: 20                       # Not used
+    number_of_images: 20                                  # Not used
   local_data_settings:
-    video_file: ""                                         # Do not specify
-    meta_file: "./input/sample.csv"
+    video_file: ""    # Set to an empty string to skip loading images.
+    meta_file: "./input/sample.csv"                       # Required
 ```
 
 #### (Only for Case 1 and Case 2) Edit console_access_settings.yaml
