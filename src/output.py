@@ -14,18 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-class Output() :
-    """Output Interface Class
 
-    """
+class Output:
+    """Output Interface Class"""
 
     def __init__(self, config, image_info, param_info):
         raise NotImplementedError
 
-
     def __del__(self):
         raise NotImplementedError
-
 
     def __call__(self, dict_meta, image=None, timestamp=None):
         """output main process

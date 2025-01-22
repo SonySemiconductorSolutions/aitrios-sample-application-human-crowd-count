@@ -14,22 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-class DataLoader() :
-    """load data interface class
 
-    """
+class DataLoader:
+    """load data interface class"""
+
     def __init__(self, config):
         raise NotImplementedError
 
     def __call__(self):
-        """load data main process
-
-        """
+        """load data main process"""
         raise NotImplementedError
 
-
     def get_image_info(self):
-        """get image info for other process
-
-        """
+        """get image info for other process"""
         raise NotImplementedError

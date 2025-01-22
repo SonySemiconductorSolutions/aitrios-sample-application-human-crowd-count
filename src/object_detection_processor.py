@@ -17,22 +17,20 @@ limitations under the License.
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__),'.'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "."))
 sys.path.append(
-    os.path.join(os.path.dirname(__file__),'smart_camera_interface_schema'))
+    os.path.join(os.path.dirname(__file__), "smart_camera_interface_schema"))
 
 import smart_camera_interface_schema.SmartCamera.BoundingBox as SBoundingBox
 import smart_camera_interface_schema.SmartCamera.BoundingBox2d as SBoundingBox2d
 import smart_camera_interface_schema.SmartCamera.ObjectDetectionTop as SObjectDetectionTop
 
-class ObjectDetectionProcessor() :
-    """Detect with ObjectDetection schema Interface Class
 
-    """
+class ObjectDetectionProcessor:
+    """Detect with ObjectDetection schema Interface Class"""
 
     def __init__(self, config):
         raise NotImplementedError
-
 
     def __call__(self, serialize_meta):
         """detect main process
@@ -43,13 +41,9 @@ class ObjectDetectionProcessor() :
         """
         raise NotImplementedError
 
-
     def get_param_info(self):
-        """Get parameter for other process
-
-        """
+        """Get parameter for other process"""
         raise NotImplementedError
-
 
     def deserialize_meta_data(self, serialize_meta):
         """Deserialize input meta data
@@ -68,20 +62,23 @@ class ObjectDetectionProcessor() :
             object_fb = SObjectDetectionTop.ObjectDetectionTop.GetRootAs(
                 serialize_meta, 0)
             if object_fb.Perception() is not None:
-                for i in range( object_fb.Perception().ObjectDetectionListLength()):
+                for i in range(
+                        object_fb.Perception().ObjectDetectionListLength()):
                     gen_obj = object_fb.Perception().ObjectDetectionList(i)
-                    if gen_obj.BoundingBoxType() \
-                        == SBoundingBox.BoundingBox().BoundingBox2d:
+                    if (gen_obj.BoundingBoxType() ==
+                            SBoundingBox.BoundingBox().BoundingBox2d):
                         bounding_box2d = SBoundingBox2d.BoundingBox2d()
                         bounding_box2d.Init(
-                            gen_obj.BoundingBox().Bytes, gen_obj.BoundingBox().Pos)
+                            gen_obj.BoundingBox().Bytes,
+                            gen_obj.BoundingBox().Pos,
+                        )
                         pos = [
                             bounding_box2d.Left(),
                             bounding_box2d.Top(),
                             bounding_box2d.Right(),
-                            bounding_box2d.Bottom()
+                            bounding_box2d.Bottom(),
                         ]
                         conf = gen_obj.Score()
                         class_id = gen_obj.ClassId()
-                        array_meta.append([pos,conf,class_id])
+                        array_meta.append([pos, conf, class_id])
         return array_meta
