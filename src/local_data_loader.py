@@ -14,18 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import ast
 import os
 import sys
-import ast
-import pandas as pd
+
 import cv2
 import flatbuffers
+import pandas as pd
 
 import data_loader
 
-sys.path.append(os.path.join(os.path.dirname(__file__),'.'))
+sys.path.append(os.path.join(os.path.dirname(__file__), "."))
 sys.path.append(
-    os.path.join(os.path.dirname(__file__),'smart_camera_interface_schema'))
+    os.path.join(os.path.dirname(__file__), "smart_camera_interface_schema"))
 
 import smart_camera_interface_schema.SmartCamera.BoundingBox as SBoundingBox
 import smart_camera_interface_schema.SmartCamera.BoundingBox2d as SBoundingBox2d
@@ -33,7 +34,8 @@ import smart_camera_interface_schema.SmartCamera.GeneralObject as SGeneralObject
 import smart_camera_interface_schema.SmartCamera.ObjectDetectionData as SObjectDetectionData
 import smart_camera_interface_schema.SmartCamera.ObjectDetectionTop as SObjectDetectionTop
 
-class LocalDataLoader(data_loader.DataLoader) :
+
+class LocalDataLoader(data_loader.DataLoader):
     """load data from local file
 
     Args:
@@ -43,15 +45,15 @@ class LocalDataLoader(data_loader.DataLoader) :
     def __init__(self, config):
 
         # Init
-        self._video_file = ''
-        self._meta_file = ''
+        self._video_file = ""
+        self._meta_file = ""
         self._image_data_list = []
         self._meta_data_list = []
         self._meta_time_list = []
 
         # Get parameter from config
-        self._video_file = config['video_file']
-        self._meta_file = config['meta_file']
+        self._video_file = config["video_file"]
+        self._meta_file = config["meta_file"]
 
     def __call__(self):
         """load data from local file
@@ -71,7 +73,6 @@ class LocalDataLoader(data_loader.DataLoader) :
 
         return self._image_data_list, self._meta_data_list, self._meta_time_list
 
-
     def get_image_info(self):
         """get image info for other process
 
@@ -83,16 +84,15 @@ class LocalDataLoader(data_loader.DataLoader) :
 
         if isinstance(self._video_file, str) and self._video_file:
             # input images
-            image_info['image_flg'] = True
+            image_info["image_flg"] = True
             basename = os.path.basename(self._video_file)
-            image_info['image_name'] = os.path.splitext(basename)[0]
+            image_info["image_name"] = os.path.splitext(basename)[0]
         else:
             # no input image
-            image_info['image_flg'] = False
-            image_info['image_name'] = None
+            image_info["image_flg"] = False
+            image_info["image_name"] = None
 
         return image_info
-
 
     def _get_images(self):
 
@@ -100,7 +100,7 @@ class LocalDataLoader(data_loader.DataLoader) :
 
         # open video check
         if not cap.isOpened():
-            raise ValueError(f'cannot open {self._video_file}')
+            raise ValueError(f"cannot open {self._video_file}")
 
         # get image data from video
         while True:
@@ -111,12 +111,11 @@ class LocalDataLoader(data_loader.DataLoader) :
             else:
                 break
 
-
     def _get_meta_data_list(self):
 
         # file check
         if not os.path.exists(self._meta_file):
-            raise ValueError(f'cannot open {self._meta_file}')
+            raise ValueError(f"cannot open {self._meta_file}")
 
         # read meta data from csv file
         # Column 1 is frame number
@@ -137,25 +136,26 @@ class LocalDataLoader(data_loader.DataLoader) :
     def _serialize_meta_data(self, dict_meta):
         general_obj_list = []
         builder = flatbuffers.Builder(0)
-        for dict_general_object in dict_meta['perception']['object_detection_list']:
+        for dict_general_object in dict_meta["perception"][
+                "object_detection_list"]:
             SBoundingBox2d.Start(builder)
-            SBoundingBox2d.AddLeft(
-                builder, dict_general_object['bounding_box']['left'])
-            SBoundingBox2d.AddTop(
-                builder, dict_general_object['bounding_box']['top'])
+            SBoundingBox2d.AddLeft(builder,
+                                   dict_general_object["bounding_box"]["left"])
+            SBoundingBox2d.AddTop(builder,
+                                  dict_general_object["bounding_box"]["top"])
             SBoundingBox2d.AddRight(
-                builder, dict_general_object['bounding_box']['right'])
+                builder, dict_general_object["bounding_box"]["right"])
             SBoundingBox2d.AddBottom(
-                builder, dict_general_object['bounding_box']['bottom'])
+                builder, dict_general_object["bounding_box"]["bottom"])
             body_bounding_box_fbs = SBoundingBox2d.End(builder)
 
             SGeneralObject.Start(builder)
-            SGeneralObject.AddClassId(builder, dict_general_object['class_id'])
+            SGeneralObject.AddClassId(builder, dict_general_object["class_id"])
             SGeneralObject.AddBoundingBoxType(
-                builder, SBoundingBox.BoundingBox().BoundingBox2d)
+                builder,
+                SBoundingBox.BoundingBox().BoundingBox2d)
             SGeneralObject.AddBoundingBox(builder, body_bounding_box_fbs)
-            SGeneralObject.AddScore(
-                builder, dict_general_object['score'])
+            SGeneralObject.AddScore(builder, dict_general_object["score"])
             general_obj = SGeneralObject.End(builder)
             general_obj_list.append(general_obj)
 
